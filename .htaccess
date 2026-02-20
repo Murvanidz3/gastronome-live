@@ -1,0 +1,10 @@
+RewriteEngine On
+
+# Redirect directly typed .php URLs to extensionless URLs
+RewriteCond %{THE_REQUEST} ^[A-Z]{3,9}\ /([^\ ]+)\.php
+RewriteRule ^/?(.*)\.php$ /$1 [L,R=301]
+
+# Silently serve .php files when an extensionless URL is requested
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}\.php -f
+RewriteRule ^(.*)$ $1.php [L]

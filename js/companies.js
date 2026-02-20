@@ -153,7 +153,7 @@
         const clickableRow = e.target.closest('.clickable-row');
         // Prevent redirect if clicking on a button, checkbox, or their labels
         if (clickableRow && !e.target.closest('button') && !e.target.closest('.custom-checkbox') && e.target.tagName !== 'INPUT') {
-            window.location.href = `/company-profile.php?id=${clickableRow.dataset.id}`;
+            window.location.href = `/company-profile?id=${clickableRow.dataset.id}`;
         }
     });
 
