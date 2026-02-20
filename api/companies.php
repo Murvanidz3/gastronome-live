@@ -71,6 +71,37 @@ try {
 
         case 'PUT':
             $input = json_decode(file_get_contents('php://input'), true);
+            $id = $input['id'] ?? 0;
+            $name = trim($input['name'] ?? '');
+            $company_id_number = trim($input['company_id_number'] ?? '');
+            $address = trim($input['address'] ?? '');
+            $phone = trim($input['phone'] ?? '');
+
+            if (empty($id) || empty($name) || empty($company_id_number)) {
+                http_response_code(400);
+                echo json_encode(['error' => 'ID, Name, and Company ID required']);
+                exit;
+            }
+
+            $stmt = $db->prepare('
+                UPDATE companies 
+                SET name = :name, company_id_number = :company_id_number, address = :address, phone = :phone
+                WHERE user_id = :user_id AND id = :id
+            ');
+            $stmt->execute([
+                ':name' => $name,
+                ':company_id_number' => $company_id_number,
+                ':address' => $address,
+                ':phone' => $phone,
+                ':user_id' => $user_id,
+                ':id' => $id
+            ]);
+
+            echo json_encode(['status' => 'success']);
+            break;
+
+        case 'DELETE':
+            $input = json_decode(file_get_contents('php://input'), true);
             $ids = $input['ids'] ?? [];
             if (!empty($ids)) {
                 $placeholders = implode(',', array_fill(0, count($ids), '?'));
