@@ -121,8 +121,10 @@ $errors = 0;
 $rowNum = 1;
 $errorMessages = [];
 
-$sql = "INSERT INTO products (image_url, barcode, name, quantity, price, currency, comment)
-        VALUES (:image_url, :barcode, :name, :quantity, :price, :currency, :comment)
+$user_id = $_SESSION['user_id'];
+
+$sql = "INSERT INTO products (user_id, image_url, barcode, name, quantity, price, currency, comment)
+        VALUES (:user_id, :image_url, :barcode, :name, :quantity, :price, :currency, :comment)
         ON DUPLICATE KEY UPDATE
             image_url = VALUES(image_url),
             name      = VALUES(name),
@@ -166,11 +168,12 @@ foreach ($lines as $line) {
         $comment = isset($colMap['comment']) ? trim($row[$colMap['comment']] ?? '') : '';
 
         // Check if product exists (for counting inserts vs updates)
-        $check = $db->prepare('SELECT id FROM products WHERE barcode = :barcode');
-        $check->execute([':barcode' => $barcode]);
+        $check = $db->prepare('SELECT id FROM products WHERE user_id = :user_id AND barcode = :barcode');
+        $check->execute([':user_id' => $user_id, ':barcode' => $barcode]);
         $exists = $check->fetch();
 
         $stmt->execute([
+            ':user_id' => $user_id,
             ':image_url' => $image_url,
             ':barcode' => $barcode,
             ':name' => $name,
