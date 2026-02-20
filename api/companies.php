@@ -23,10 +23,12 @@ try {
             break;
 
         case 'POST':
-            $name = trim($_POST['name'] ?? '');
-            $company_id_number = trim($_POST['company_id_number'] ?? '');
-            $address = trim($_POST['address'] ?? '');
-            $phone = trim($_POST['phone'] ?? '');
+            $input = json_decode(file_get_contents('php://input'), true);
+            $id = $input['id'] ?? '';
+            $name = trim($input['name'] ?? '');
+            $company_id_number = trim($input['company_id_number'] ?? '');
+            $address = trim($input['address'] ?? '');
+            $phone = trim($input['phone'] ?? '');
 
             if (empty($name) || empty($company_id_number)) {
                 http_response_code(400);
@@ -34,53 +36,40 @@ try {
                 exit;
             }
 
-            $stmt = $db->prepare('
-                INSERT INTO companies (user_id, name, company_id_number, address, phone)
-                VALUES (:user_id, :name, :company_id_number, :address, :phone)
-            ');
-            $stmt->execute([
-                ':user_id' => $user_id,
-                ':name' => $name,
-                ':company_id_number' => $company_id_number,
-                ':address' => $address,
-                ':phone' => $phone
-            ]);
-
-            echo json_encode(['status' => 'success', 'id' => $db->lastInsertId()]);
+            if (!empty($id)) {
+                // It's an update (acting as PUT)
+                $stmt = $db->prepare('
+                    UPDATE companies 
+                    SET name = :name, company_id_number = :company_id_number, address = :address, phone = :phone
+                    WHERE user_id = :user_id AND id = :id
+                ');
+                $stmt->execute([
+                    ':name' => $name,
+                    ':company_id_number' => $company_id_number,
+                    ':address' => $address,
+                    ':phone' => $phone,
+                    ':user_id' => $user_id,
+                    ':id' => $id
+                ]);
+                echo json_encode(['status' => 'success']);
+            } else {
+                // It's a new insertion
+                $stmt = $db->prepare('
+                    INSERT INTO companies (user_id, name, company_id_number, address, phone)
+                    VALUES (:user_id, :name, :company_id_number, :address, :phone)
+                ');
+                $stmt->execute([
+                    ':user_id' => $user_id,
+                    ':name' => $name,
+                    ':company_id_number' => $company_id_number,
+                    ':address' => $address,
+                    ':phone' => $phone
+                ]);
+                echo json_encode(['status' => 'success', 'id' => $db->lastInsertId()]);
+            }
             break;
 
         case 'PUT':
-            $input = json_decode(file_get_contents('php://input'), true);
-            $id = $input['id'] ?? 0;
-            $name = trim($input['name'] ?? '');
-            $company_id_number = trim($input['company_id_number'] ?? '');
-            $address = trim($input['address'] ?? '');
-            $phone = trim($input['phone'] ?? '');
-
-            if (empty($id) || empty($name) || empty($company_id_number)) {
-                http_response_code(400);
-                echo json_encode(['error' => 'ID, Name, and Company ID required']);
-                exit;
-            }
-
-            $stmt = $db->prepare('
-                UPDATE companies 
-                SET name = :name, company_id_number = :company_id_number, address = :address, phone = :phone
-                WHERE user_id = :user_id AND id = :id
-            ');
-            $stmt->execute([
-                ':name' => $name,
-                ':company_id_number' => $company_id_number,
-                ':address' => $address,
-                ':phone' => $phone,
-                ':user_id' => $user_id,
-                ':id' => $id
-            ]);
-
-            echo json_encode(['status' => 'success']);
-            break;
-
-        case 'DELETE':
             $input = json_decode(file_get_contents('php://input'), true);
             $ids = $input['ids'] ?? [];
             if (!empty($ids)) {
