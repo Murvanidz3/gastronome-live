@@ -274,7 +274,7 @@ body {
 }
 
 .glass-select option {
-    background: #1e1b4b;
+    background: #121212;
     color: #fff;
 }
 
@@ -586,7 +586,7 @@ body {
     right: 0;
     max-height: 260px;
     overflow-y: auto;
-    background: rgba(15, 12, 41, 0.95);
+    background: rgba(15, 15, 15, 0.95);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border: 1px solid var(--glass-border);
