@@ -80,7 +80,7 @@ body {
     left: 0;
     width: var(--sidebar-width);
     height: 100vh;
-    background: rgba(15, 12, 41, 0.85);
+    background: rgba(10, 10, 10, 0.85);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border-right: 1px solid var(--glass-border);
@@ -98,10 +98,7 @@ body {
 .sidebar-logo {
     font-size: 1.35rem;
     font-weight: 700;
-    background: linear-gradient(135deg, #6366f1, #a855f7, #ec4899);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: var(--text-primary);
 }
 
 .sidebar-nav {
