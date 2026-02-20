@@ -209,7 +209,7 @@
                 const res = await fetch('/api/companies.php', {
                     method: 'DELETE',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ id: itemToDelete })
+                    body: JSON.stringify({ ids: itemToDelete })
                 });
                 const data = await res.json();
                 if (data.error) throw new Error(data.error);
