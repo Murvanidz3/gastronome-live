@@ -5,16 +5,17 @@
  */
 
 define('DB_HOST', 'localhost');
-define('DB_NAME', 'gastronome');
-define('DB_USER', 'root');
-define('DB_PASS', '');
+define('DB_NAME', 'u888090391_gastr');
+define('DB_USER', 'u888090391_gastr');
+define('DB_PASS', 'Tormeti21!');
 define('DB_CHARSET', 'utf8mb4');
 
 /**
  * Get PDO database connection
  * @return PDO
  */
-function getDB(): PDO {
+function getDB(): PDO
+{
     static $pdo = null;
 
     if ($pdo === null) {
@@ -26,9 +27,9 @@ function getDB(): PDO {
         );
 
         $options = [
-            PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-            PDO::ATTR_EMULATE_PREPARES   => false,
+            PDO::ATTR_EMULATE_PREPARES => false,
         ];
 
         try {
