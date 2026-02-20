@@ -27,12 +27,11 @@ $baseUrl = '';
 <body>
     <!-- Sidebar Navigation -->
     <nav class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <div class="sidebar-logo">🍽 Gastronome</div>
-            <div style="text-align: center; margin-top: 15px; padding: 0 15px;">
+        <div class="sidebar-header" style="padding: 20px 15px 10px 15px; text-align: center;">
+            <a href="<?php echo $baseUrl; ?>/index.php" style="display: inline-block;">
                 <img src="<?php echo $baseUrl; ?>/img/invlogo.png" alt="Gastronome Logo"
                     style="max-width: 100%; max-height: 80px; object-fit: contain;">
-            </div>
+            </a>
         </div>
         <ul class="sidebar-nav">
             <li>
