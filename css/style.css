@@ -14,18 +14,18 @@
 
 /* ─── CSS Custom Properties ─── */
 :root {
-    --bg-gradient-start: #0f0c29;
-    --bg-gradient-mid: #302b63;
-    --bg-gradient-end: #24243e;
+    --bg-gradient-start: #0a0a0a;
+    --bg-gradient-mid: #121212;
+    --bg-gradient-end: #0f0f0f;
 
-    --glass-bg: rgba(255, 255, 255, 0.06);
-    --glass-border: rgba(255, 255, 255, 0.12);
-    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.37);
+    --glass-bg: rgba(255, 255, 255, 0.03);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --glass-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
     --glass-blur: 16px;
 
     --text-primary: rgba(255, 255, 255, 0.95);
-    --text-secondary: rgba(255, 255, 255, 0.6);
-    --text-muted: rgba(255, 255, 255, 0.35);
+    --text-secondary: rgba(255, 255, 255, 0.7);
+    --text-muted: rgba(255, 255, 255, 0.4);
 
     --accent: #818cf8;
     --accent-hover: #6366f1;
