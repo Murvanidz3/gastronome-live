@@ -66,13 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         .login-card .logo {
-            font-size: 2rem;
-            font-weight: 700;
             margin-bottom: 8px;
-            background: linear-gradient(135deg, #6366f1, #a855f7, #ec4899);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
         }
 
         .login-card .subtitle {
@@ -132,7 +126,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <body class="login-body">
     <div class="glass-card login-card">
-        <div class="logo">🍽 Gastronome</div>
+        <div class="logo">
+            <img src="/img/invlogo.png" alt="Gastronome Logo"
+                style="max-width: 100%; max-height: 90px; object-fit: contain;">
+        </div>
         <div class="subtitle">Product Management System</div>
 
         <?php if ($error): ?>
