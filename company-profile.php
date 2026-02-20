@@ -30,11 +30,7 @@ $invStmt = $db->prepare('SELECT * FROM invoices WHERE company_id = :cid ORDER BY
 $invStmt->execute([':cid' => $company_id]);
 $invoices = $invStmt->fetchAll(PDO::FETCH_ASSOC);
 
-if (!$company) {
-    // Company not found or does not belong to user
-    header('Location: /companies.php');
-    exit;
-}
+
 
 $pageTitle = 'Company Profile - ' . htmlspecialchars($company['name']);
 $activePage = 'companies'; // keep companies nav item active
