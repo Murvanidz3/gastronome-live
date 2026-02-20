@@ -17,7 +17,6 @@
     const grandTotalEl = document.getElementById('invoiceGrandTotal');
     const clearBtn = document.getElementById('clearInvoiceBtn');
     const printBtn = document.getElementById('printInvoiceBtn');
-    const pdfBtn = document.getElementById('exportPdfBtn');
 
     if (!searchInput) return;
 
@@ -254,55 +253,6 @@
     if (invNumberDisplay) {
         invNumberDisplay.textContent = generateInvoiceNumber();
     }
-
-    // ─── PDF Export ───
-    pdfBtn.addEventListener('click', () => {
-        // Hide action buttons for PDF
-        actionsEl.style.display = 'none';
-        const searchCard = searchInput.closest('.glass-card');
-        if (searchCard) searchCard.style.display = 'none';
-
-        const invoiceCard = document.querySelector('#invoiceTable').closest('.glass-card');
-
-        // Apply temporary print-like classes for HTML2PDF rendering without media queries depending on screen size
-        invoiceCard.classList.add('pdf-render-mode');
-
-        // We override some local styles just before render to ensure it looks like print
-        const billToCompanyInput = document.getElementById('billToCompany');
-        const billToIdInput = document.getElementById('billToId');
-
-        let originalCompanyVal = '', originalIdVal = '';
-        if (billToCompanyInput) {
-            originalCompanyVal = billToCompanyInput.value;
-            billToCompanyInput.outerHTML = `<div id="tmp-company-text" style="font-weight: bold; font-family: 'BpgGEL', sans-serif; font-size: 0.85rem;">${escHtml(originalCompanyVal) || 'Company Name'}</div>`;
-        }
-        if (billToIdInput) {
-            originalIdVal = billToIdInput.value;
-            billToIdInput.outerHTML = `<div id="tmp-id-text" style="font-family: 'BpgGEL', sans-serif; font-size: 0.85rem;">${escHtml(originalIdVal) || 'Company ID'}</div>`;
-        }
-
-        const opt = {
-            margin: [10, 10, 5, 10],  // Reduced bottom margin
-            filename: `invoice-${invNumberDisplay ? invNumberDisplay.textContent : 'export'}.pdf`,
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2, useCORS: true },
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-            pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
-        };
-
-        html2pdf().set(opt).from(invoiceCard).save().then(() => {
-            actionsEl.style.display = '';
-            if (searchCard) searchCard.style.display = '';
-            invoiceCard.classList.remove('pdf-render-mode');
-
-            // Restore inputs
-            const tmpComp = document.getElementById('tmp-company-text');
-            if (tmpComp) tmpComp.outerHTML = `<input type="text" id="billToCompany" placeholder="Company Name" class="print-input" style="font-weight: bold; font-family: 'BpgGEL', sans-serif;" value="${originalCompanyVal}">`;
-
-            const tmpId = document.getElementById('tmp-id-text');
-            if (tmpId) tmpId.outerHTML = `<input type="text" id="billToId" placeholder="Company ID (ს/კ)" class="print-input" style="font-family: 'BpgGEL', sans-serif;" value="${originalIdVal}">`;
-        });
-    });
 
     // ─── LocalStorage for BILL TO ───
     const billToCompanyInput = document.getElementById('billToCompany');

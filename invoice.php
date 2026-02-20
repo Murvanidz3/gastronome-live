@@ -126,11 +126,8 @@ require_once __DIR__ . '/includes/header.php';
 <div class="invoice-actions mt-3" id="invoiceActions" style="display:none;">
     <button class="btn btn-secondary" id="clearInvoiceBtn">🗑 Clear All</button>
     <button class="btn btn-primary" id="printInvoiceBtn">🖨 Print Invoice</button>
-    <button class="btn btn-success" id="exportPdfBtn">📄 Export PDF</button>
 </div>
 
-<!-- html2pdf.js CDN for PDF export -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script src="/js/invoice.js?v=<?php echo time(); ?>"></script>
 
 </main>
