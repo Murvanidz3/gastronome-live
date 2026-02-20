@@ -49,13 +49,6 @@ $baseUrl = '';
                 </a>
             </li>
             <li>
-                <a href="<?php echo $baseUrl; ?>/csv-import.php"
-                    class="<?php echo $activePage === 'csv-import' ? 'active' : ''; ?>">
-                    <span class="nav-icon">📥</span>
-                    <span class="nav-text">CSV Import</span>
-                </a>
-            </li>
-            <li>
                 <a href="<?php echo $baseUrl; ?>/invoice.php"
                     class="<?php echo $activePage === 'invoice' ? 'active' : ''; ?>">
                     <span class="nav-icon">🧾</span>
@@ -71,6 +64,13 @@ $baseUrl = '';
                     </a>
                 </li>
             <?php endif; ?>
+            <li>
+                <a href="<?php echo $baseUrl; ?>/csv-import.php"
+                    class="<?php echo $activePage === 'csv-import' ? 'active' : ''; ?>">
+                    <span class="nav-icon">📥</span>
+                    <span class="nav-text">CSV Import</span>
+                </a>
+            </li>
         </ul>
         <div class="sidebar-footer">
             <?php if (isset($_SESSION['user_name'])): ?>
