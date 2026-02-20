@@ -237,7 +237,40 @@
         if (iInp && iInp.value === 'Company ID' && !prePrintCompanyId) iInp.value = '';
     });
 
-    printBtn.addEventListener('click', () => {
+    printBtn.addEventListener('click', async () => {
+        // If a company is selected (via badge/localStorage), attempt to save it to DB
+        const companyName = localStorage.getItem('invoice_billToCompany');
+        const companyIdNumber = localStorage.getItem('invoice_billToId');
+        const invoiceNum = invNumberDisplay ? invNumberDisplay.textContent : generateInvoiceNumber();
+        const totalText = grandTotalEl ? grandTotalEl.textContent.replace(/[^0-9.-]+/g, "") : '0';
+        const totalAmount = parseFloat(totalText);
+
+        if (companyName && companyIdNumber) {
+            // We need the internal company ID from the autocomplete or we can look it up API side. 
+            // To simplify, we previously stored only name and id number in local storage.
+            // We need to fetch the internal DB company ID to link it properly.
+            try {
+                // Find company by company_id_number
+                const searchRes = await fetch(`/api/search_companies.php?q=${encodeURIComponent(companyIdNumber)}`);
+                const comps = await searchRes.json();
+                const comp = comps.find(c => c.company_id_number === companyIdNumber);
+
+                if (comp) {
+                    await fetch('/api/save_invoice.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            company_id: comp.id,
+                            invoice_number: invoiceNum,
+                            total_amount: totalAmount
+                        })
+                    });
+                }
+            } catch (e) {
+                console.error('Failed to save invoice to history:', e);
+            }
+        }
+
         window.print();
     });
 
