@@ -28,15 +28,14 @@ $baseUrl = '';
     <!-- Sidebar Navigation -->
     <nav class="sidebar" id="sidebar">
         <div class="sidebar-header" style="padding: 20px 15px 10px 15px; text-align: center;">
-            <a href="<?php echo $baseUrl; ?>/index" style="display: inline-block;">
+            <a href="<?php echo $baseUrl; ?>/" style="display: inline-block;">
                 <img src="<?php echo $baseUrl; ?>/img/invlogo.png" alt="Gastronome Logo"
                     style="max-width: 100%; max-height: 80px; object-fit: contain;">
             </a>
         </div>
         <ul class="sidebar-nav">
             <li>
-                <a href="<?php echo $baseUrl; ?>/index"
-                    class="<?php echo $activePage === 'dashboard' ? 'active' : ''; ?>">
+                <a href="<?php echo $baseUrl; ?>/" class="<?php echo $activePage === 'dashboard' ? 'active' : ''; ?>">
                     <span class="nav-icon">📦</span>
                     <span class="nav-text">Products</span>
                 </a>

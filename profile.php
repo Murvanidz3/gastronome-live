@@ -6,7 +6,7 @@ require_once __DIR__ . '/auth/guard.php';
 
 // Only masho can access user management
 if (!isset($_SESSION['username']) || strtolower($_SESSION['username']) !== 'masho') {
-    header('Location: /index.php');
+    header('Location: /');
     exit;
 }
 

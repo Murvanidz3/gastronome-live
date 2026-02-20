@@ -8,7 +8,7 @@ require_once __DIR__ . '/../config/database.php';
 
 // Already logged in? Go to dashboard
 if (isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === true) {
-    header('Location: /index.php');
+    header('Location: /');
     exit;
 }
 
@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['user_name'] = $user['full_name'];
             $_SESSION['username'] = $user['username'];
-            header('Location: /index.php');
+            header('Location: /');
             exit;
         } else {
             $error = 'Invalid username or password.';
