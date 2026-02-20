@@ -146,6 +146,14 @@
             itemToDelete = [deleteBtn.dataset.id];
             confirmMessage.textContent = 'Are you sure you want to delete this company?';
             confirmModal.style.display = 'flex';
+            return;
+        }
+
+        // Handle row click
+        const clickableRow = e.target.closest('.clickable-row');
+        // Prevent redirect if clicking on a button, checkbox, or their labels
+        if (clickableRow && !e.target.closest('button') && !e.target.closest('.custom-checkbox') && e.target.tagName !== 'INPUT') {
+            window.location.href = `/company-profile.php?id=${clickableRow.dataset.id}`;
         }
     });
 

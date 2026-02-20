@@ -75,7 +75,7 @@ require_once __DIR__ . '/includes/header.php';
                     </tr>
                 <?php else: ?>
                     <?php foreach ($companies as $c): ?>
-                        <tr data-id="<?php echo $c['id']; ?>">
+                        <tr class="clickable-row" data-id="<?php echo $c['id']; ?>">
                             <td>
                                 <label class="custom-checkbox">
                                     <input type="checkbox" class="row-select" value="<?php echo $c['id']; ?>">
