@@ -175,7 +175,7 @@
             editError.style.display = 'none';
 
             try {
-                const res = await fetch('/api/companies.php', {
+                const res = await fetch('/api/companies', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
@@ -214,7 +214,7 @@
             confirmDeleteBtn.textContent = 'Deleting...';
 
             try {
-                const res = await fetch('/api/companies.php', {
+                const res = await fetch('/api/companies', {
                     method: 'DELETE',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ ids: itemToDelete })

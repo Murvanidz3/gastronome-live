@@ -44,7 +44,7 @@
     });
 
     function fetchProducts(query) {
-        fetch(`/api/search.php?q=${encodeURIComponent(query)}`)
+        fetch(`/api/search?q=${encodeURIComponent(query)}`)
             .then(r => r.json())
             .then(products => showAutocomplete(products))
             .catch(() => hideAutocomplete());
@@ -251,12 +251,12 @@
             // We need to fetch the internal DB company ID to link it properly.
             try {
                 // Find company by company_id_number
-                const searchRes = await fetch(`/api/search_companies.php?q=${encodeURIComponent(companyIdNumber)}`);
+                const searchRes = await fetch(`/api/search_companies?q=${encodeURIComponent(companyIdNumber)}`);
                 const comps = await searchRes.json();
                 const comp = comps.find(c => c.company_id_number === companyIdNumber);
 
                 if (comp) {
-                    await fetch('/api/save_invoice.php', {
+                    await fetch('/api/save_invoice', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
@@ -375,7 +375,7 @@
     }
 
     function fetchCompanies(query) {
-        fetch(`/api/search_companies.php?q=${encodeURIComponent(query)}`)
+        fetch(`/api/search_companies?q=${encodeURIComponent(query)}`)
             .then(r => {
                 if (!r.ok) {
                     throw new Error('HTTP status ' + r.status);

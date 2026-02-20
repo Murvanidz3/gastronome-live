@@ -14,21 +14,31 @@ if (!$company_id) {
     exit;
 }
 
-$db = getDB();
-$stmt = $db->prepare('SELECT * FROM companies WHERE id = :id AND user_id = :user_id');
-$stmt->execute([':id' => $company_id, ':user_id' => $user_id]);
-$company = $stmt->fetch(PDO::FETCH_ASSOC);
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
 
-if (!$company) {
-    // Company not found or does not belong to user
-    header('Location: /companies.php');
-    exit;
+try {
+    $db = getDB();
+    $stmt = $db->prepare('SELECT * FROM companies WHERE id = :id AND user_id = :user_id');
+    $stmt->execute([':id' => $company_id, ':user_id' => $user_id]);
+    $company = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$company) {
+        // Company not found or does not belong to user
+        header('Location: /companies.php');
+        exit;
+    }
+
+    // Fetch invoice history
+    $invStmt = $db->prepare('SELECT * FROM invoices WHERE company_id = :cid ORDER BY created_at DESC');
+    $invStmt->execute([':cid' => $company_id]);
+    $invoices = $invStmt->fetchAll(PDO::FETCH_ASSOC);
+    if (!$invoices) {
+        $invoices = [];
+    }
+} catch (Exception $e) {
+    die("Database Error: " . $e->getMessage());
 }
-
-// Fetch invoice history
-$invStmt = $db->prepare('SELECT * FROM invoices WHERE company_id = :cid ORDER BY created_at DESC');
-$invStmt->execute([':cid' => $company_id]);
-$invoices = $invStmt->fetchAll(PDO::FETCH_ASSOC);
 
 
 
@@ -199,7 +209,7 @@ require_once __DIR__ . '/includes/header.php';
             saveNotesBtn.textContent = 'Saving...';
 
             try {
-                const res = await fetch('/api/company_notes.php', {
+                const res = await fetch('/api/company_notes', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({

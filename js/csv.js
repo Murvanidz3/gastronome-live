@@ -82,7 +82,7 @@
         progressBar.style.width = '30%';
         resultsDiv.classList.add('hidden');
 
-        fetch('/api/import.php', {
+        fetch('/api/import', {
             method: 'POST',
             body: formData,
         })

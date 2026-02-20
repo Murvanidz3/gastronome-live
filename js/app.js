@@ -52,7 +52,7 @@
     });
 
     function performSearch(query) {
-        fetch(`${BASE}/api/search.php?q=${encodeURIComponent(query)}`)
+        fetch(`${BASE}/api/search?q=${encodeURIComponent(query)}`)
             .then(res => res.json())
             .then(products => {
                 renderTable(products);
@@ -202,7 +202,7 @@
 
     // ─── Delete API ───
     function deleteProducts(payload) {
-        fetch(`${BASE}/api/delete.php`, {
+        fetch(`${BASE}/api/delete`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload),
@@ -296,7 +296,7 @@
             return;
         }
 
-        fetch(`${BASE}/api/update.php`, {
+        fetch(`${BASE}/api/update`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload),

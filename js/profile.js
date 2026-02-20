@@ -207,7 +207,7 @@
 
     // ─── API Helper ───
     function apiCall(payload) {
-        return fetch(`${BASE}/api/users.php`, {
+        return fetch(`${BASE}/api/users`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload),

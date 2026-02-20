@@ -15,6 +15,6 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
     $_SESSION = [];
     session_destroy();
 
-    header('Location: /auth/login.php');
+    header('Location: /auth/login');
     exit;
 }
