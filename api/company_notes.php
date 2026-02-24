@@ -15,14 +15,16 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 $input = json_decode(file_get_contents('php://input'), true);
 
-if (!isset($input['id']) || !isset($input['notes'])) {
+$action = $input['action'] ?? 'add';
+
+if (!isset($input['id']) || ($action !== 'delete' && !isset($input['notes']))) {
     http_response_code(400);
     echo json_encode(['error' => 'Invalid parameters']);
     exit;
 }
 
 $company_id = (int) $input['id'];
-$notes = $input['notes'];
+$notes = $input['notes'] ?? '';
 $user_id = $_SESSION['user_id'];
 
 try {
