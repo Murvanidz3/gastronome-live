@@ -286,7 +286,8 @@
                         body: JSON.stringify({
                             company_id: compId,
                             invoice_number: invoiceNum,
-                            total_amount: totalAmount
+                            total_amount: totalAmount,
+                            items: invoiceItems
                         })
                     });
                 }
