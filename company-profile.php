@@ -36,10 +36,29 @@ try {
     if (!$invoices) {
         $invoices = [];
     }
+
+    // Parse notes
+    $notes_data = [];
+    if (!empty($company['notes'])) {
+        $decoded = json_decode($company['notes'], true);
+        if (is_array($decoded)) {
+            $notes_data = $decoded;
+            // Sort descending by date
+            usort($notes_data, function ($a, $b) {
+                return strtotime($b['date'] ?? '0') - strtotime($a['date'] ?? '0');
+            });
+        } else {
+            // Migration case
+            $notes_data[] = [
+                'text' => $company['notes'],
+                'date' => date('Y-m-d\TH:i:sP')
+            ];
+        }
+    }
+
 } catch (Exception $e) {
     die("Database Error: " . $e->getMessage());
 }
-
 
 
 $pageTitle = 'Company Profile - ' . htmlspecialchars($company['name']);
@@ -127,7 +146,7 @@ require_once __DIR__ . '/includes/header.php';
 
             <!-- Notes Card -->
             <div
-                style="padding: 20px; background: rgba(255, 255, 255, 0.03); border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.05); display: flex; flex-direction: column; height: 350px;">
+                style="padding: 20px; background: rgba(255, 255, 255, 0.03); border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.05); display: flex; flex-direction: column; height: 380px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
                     <div
                         style="font-size: 0.85rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; font-weight: bold;">
@@ -135,10 +154,36 @@ require_once __DIR__ . '/includes/header.php';
                     <span id="notesStatus"
                         style="font-size: 0.8rem; color: #4ade80; opacity: 0; transition: opacity 0.3s;">Saved</span>
                 </div>
-                <textarea id="companyNotes" class="glass-textarea" style="flex: 1; resize: none; margin-bottom: 12px;"
-                    placeholder="Add comments, status updates, or everyday changes here..."><?php echo htmlspecialchars($company['notes'] ?? ''); ?></textarea>
-                <div style="display: flex; justify-content: flex-end;">
-                    <button id="saveNotesBtn" class="btn btn-primary btn-sm">Save Notes</button>
+                <textarea id="companyNotes" class="glass-textarea"
+                    style="height: 70px; min-height: 70px; resize: none; margin-bottom: 10px; font-size: 0.9rem;"
+                    placeholder="Add a new update or note..."></textarea>
+                <div style="display: flex; justify-content: flex-end; margin-bottom: 16px;">
+                    <button id="saveNotesBtn" class="btn btn-primary btn-sm">Save Note</button>
+                </div>
+
+                <!-- Floating Cards List -->
+                <div id="notesContainer"
+                    style="display: flex; flex-direction: column; gap: 8px; flex: 1; overflow-y: auto; padding-right: 5px;">
+                    <?php if (empty($notes_data)): ?>
+                        <div class="empty-state" style="padding: 10px;">
+                            <p style="font-size: 0.85rem; margin: 0;">No updates yet.</p>
+                        </div>
+                    <?php else: ?>
+                        <?php foreach ($notes_data as $note): ?>
+                            <div class="note-card hover-glow"
+                                style="padding: 10px 12px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; cursor: pointer; border: 1px solid rgba(255, 255, 255, 0.05); transition: background 0.2s;"
+                                onclick="openNoteModal(this)">
+                                <div style="display: none;" class="full-note-text">
+                                    <?php echo htmlspecialchars($note['text']); ?></div>
+                                <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 4px;">
+                                    <?php echo date('M j, Y, H:i', strtotime($note['date'] ?? 'now')); ?></div>
+                                <div
+                                    style="font-size: 0.9rem; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-height: 20px;">
+                                    <?php echo htmlspecialchars($note['text']); ?>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
                 </div>
             </div>
 
@@ -185,6 +230,20 @@ require_once __DIR__ . '/includes/header.php';
     </div>
 </div>
 
+<!-- Note Modal -->
+<div class="modal-overlay" id="noteModal" style="display:none; z-index: 1000;">
+    <div class="glass-card modal-card" style="max-width: 500px;">
+        <div class="modal-header">
+            <h2>📝 Note Update</h2>
+            <button class="btn btn-icon btn-sm btn-secondary" onclick="closeNoteModal()">✕</button>
+        </div>
+        <div id="noteModalContent" style="padding: 10px 0; color: var(--text-primary); font-size: 1rem; line-height: 1.6; white-space: pre-wrap; max-height: 400px; overflow-y: auto;"></div>
+        <div class="modal-actions" style="margin-top: 20px;">
+            <button class="btn btn-secondary" onclick="closeNoteModal()">Close</button>
+        </div>
+    </div>
+</div>
+
 </main>
 <script>
     const mobileBtn = document.getElementById('mobileMenuBtn');
@@ -205,6 +264,9 @@ require_once __DIR__ . '/includes/header.php';
 
     if (saveNotesBtn && companyNotes) {
         saveNotesBtn.addEventListener('click', async () => {
+            const newNote = companyNotes.value.trim();
+            if (!newNote) return; // Prevent empty saves
+            
             saveNotesBtn.disabled = true;
             saveNotesBtn.textContent = 'Saving...';
 
@@ -214,22 +276,43 @@ require_once __DIR__ . '/includes/header.php';
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         id: <?php echo $company['id']; ?>,
-                        notes: companyNotes.value
+                        notes: newNote
                     })
                 });
 
-                if (!res.ok) throw new Error('Failed to save notes');
+                if (!res.ok) throw new Error('Failed to save note');
 
                 notesStatus.style.opacity = '1';
-                setTimeout(() => notesStatus.style.opacity = '0', 2000);
+                setTimeout(() => {
+                    notesStatus.style.opacity = '0';
+                    window.location.reload(true); // reload to fetch new notes history
+                }, 500);
             } catch (err) {
-                alert('Error saving notes.');
-            } finally {
+                alert('Error saving note.');
                 saveNotesBtn.disabled = false;
-                saveNotesBtn.textContent = 'Save Notes';
+                saveNotesBtn.textContent = 'Save Note';
             }
         });
     }
+
+    // Modal Logic
+    function openNoteModal(cardEl) {
+        const fullText = cardEl.querySelector('.full-note-text').textContent;
+        document.getElementById('noteModalContent').textContent = fullText;
+        document.getElementById('noteModal').style.display = 'flex';
+    }
+
+    function closeNoteModal() {
+        document.getElementById('noteModal').style.display = 'none';
+    }
+
+    // Close modal on outside click
+    window.addEventListener('click', (e) => {
+        const modal = document.getElementById('noteModal');
+        if (e.target === modal) {
+            closeNoteModal();
+        }
+    });
 </script>
 </body>
 
