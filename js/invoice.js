@@ -268,17 +268,23 @@
             // To simplify, we previously stored only name and id number in local storage.
             // We need to fetch the internal DB company ID to link it properly.
             try {
-                // Find company by company_id_number
-                const searchRes = await fetch(`/api/search_companies?q=${encodeURIComponent(companyIdNumber)}`);
-                const comps = await searchRes.json();
-                const comp = comps.find(c => c.company_id_number === companyIdNumber);
+                let compId = null;
+                if (window.PREFILLED_COMPANY && window.PREFILLED_COMPANY.company_id_number === companyIdNumber) {
+                    compId = window.PREFILLED_COMPANY.id;
+                } else {
+                    // Find company by company_id_number
+                    const searchRes = await fetch(`/api/search_companies?q=${encodeURIComponent(companyIdNumber)}`);
+                    const comps = await searchRes.json();
+                    const comp = comps.find(c => c.company_id_number === companyIdNumber);
+                    if (comp) compId = comp.id;
+                }
 
-                if (comp) {
+                if (compId) {
                     await fetch('/api/save_invoice', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
-                            company_id: comp.id,
+                            company_id: compId,
                             invoice_number: invoiceNum,
                             total_amount: totalAmount
                         })
@@ -331,12 +337,20 @@
     }
 
     if (billToCompanyInput && billToIdInput) {
-        // Load saved values
-        const savedCompany = localStorage.getItem('invoice_billToCompany') || '';
-        billToCompanyInput.value = savedCompany;
-        billToIdInput.value = localStorage.getItem('invoice_billToId') || '';
+        if (window.PREFILLED_COMPANY) {
+            billToCompanyInput.value = window.PREFILLED_COMPANY.name;
+            billToIdInput.value = window.PREFILLED_COMPANY.company_id_number;
+            localStorage.setItem('invoice_billToCompany', window.PREFILLED_COMPANY.name);
+            localStorage.setItem('invoice_billToId', window.PREFILLED_COMPANY.company_id_number);
+            updateCompanyBadge(window.PREFILLED_COMPANY.name);
+        } else {
+            // Load saved values
+            const savedCompany = localStorage.getItem('invoice_billToCompany') || '';
+            billToCompanyInput.value = savedCompany;
+            billToIdInput.value = localStorage.getItem('invoice_billToId') || '';
 
-        updateCompanyBadge(savedCompany);
+            updateCompanyBadge(savedCompany);
+        }
 
         // Save on change
         billToCompanyInput.addEventListener('input', (e) => {

@@ -169,25 +169,33 @@ require_once __DIR__ . '/includes/header.php';
                             <p style="font-size: 0.85rem; margin: 0;">No updates yet.</p>
                         </div>
                     <?php else: ?>
-                        <?php foreach ($notes_data as $note): 
+                        <?php foreach ($notes_data as $note):
                             $nId = $note['id'] ?? uniqid('n_');
-                        ?>
+                            ?>
                             <div class="note-card hover-glow"
                                 style="position: relative; padding: 10px 12px; padding-left: 16px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; cursor: pointer; border: 1px solid rgba(255, 255, 255, 0.05); transition: background 0.2s;"
                                 onclick="openNoteModal(this)">
                                 <!-- Thin shape linear gradient -->
-                                <div style="position: absolute; left: -1px; top: -1px; bottom: -1px; width: 4px; background: linear-gradient(135deg, #6366f1, #8b5cf6); border-radius: 8px 0 0 8px;"></div>
-                                
-                                <!-- Action buttons -->
-                                <div style="position: absolute; right: 8px; top: 10px; display: flex; gap: 6px;">
-                                    <button class="btn btn-icon btn-sm btn-secondary" style="width: 24px; height: 24px; padding: 0; font-size: 0.7rem;" onclick="editNote('<?php echo $nId; ?>', this, event)" title="Edit">✏️</button>
-                                    <button class="btn btn-icon btn-sm btn-danger" style="width: 24px; height: 24px; padding: 0; font-size: 0.7rem;" onclick="deleteNote('<?php echo $nId; ?>', event)" title="Delete">🗑</button>
+                                <div
+                                    style="position: absolute; left: -1px; top: -1px; bottom: -1px; width: 4px; background: linear-gradient(135deg, #6366f1, #8b5cf6); border-radius: 8px 0 0 8px;">
                                 </div>
 
-                                <div style="display: none;" class="full-note-text"><?php echo htmlspecialchars($note['text']); ?></div>
+                                <!-- Action buttons -->
+                                <div style="position: absolute; right: 8px; top: 10px; display: flex; gap: 6px;">
+                                    <button class="btn btn-icon btn-sm btn-secondary"
+                                        style="width: 24px; height: 24px; padding: 0; font-size: 0.7rem;"
+                                        onclick="editNote('<?php echo $nId; ?>', this, event)" title="Edit">✏️</button>
+                                    <button class="btn btn-icon btn-sm btn-danger"
+                                        style="width: 24px; height: 24px; padding: 0; font-size: 0.7rem;"
+                                        onclick="deleteNote('<?php echo $nId; ?>', event)" title="Delete">🗑</button>
+                                </div>
+
+                                <div style="display: none;" class="full-note-text">
+                                    <?php echo htmlspecialchars($note['text']); ?></div>
                                 <div style="display: none;" class="note-id"><?php echo $nId; ?></div>
-                                
-                                <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 4px; padding-right: 50px;">
+
+                                <div
+                                    style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 4px; padding-right: 50px;">
                                     <?php echo date('M j, Y, H:i', strtotime($note['date'] ?? 'now')); ?>
                                 </div>
                                 <div
@@ -203,9 +211,16 @@ require_once __DIR__ . '/includes/header.php';
             <!-- Invoice History Card -->
             <div
                 style="padding: 20px; background: rgba(255, 255, 255, 0.03); border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.05); flex: 1;">
-                <div
-                    style="font-size: 0.85rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; font-weight: bold; margin-bottom: 12px;">
-                    🧾 Invoice History</div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <div
+                        style="font-size: 0.85rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; font-weight: bold;">
+                        🧾 Invoice History
+                    </div>
+                    <a href="/invoice.php?company_id=<?php echo $company['id']; ?>" class="btn btn-primary btn-sm"
+                        style="display: flex; align-items: center; gap: 6px;">
+                        ➕ Create Invoice
+                    </a>
+                </div>
 
                 <?php if (empty($invoices)): ?>
                     <div class="empty-state" style="padding: 30px 10px;">

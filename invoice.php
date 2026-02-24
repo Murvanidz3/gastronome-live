@@ -3,11 +3,24 @@
  * Invoice Generator Page
  */
 require_once __DIR__ . '/auth/guard.php';
+require_once __DIR__ . '/config/database.php';
+
+$prefilled_company = null;
+if (isset($_GET['company_id'])) {
+    $cid = (int) $_GET['company_id'];
+    $db = getDB();
+    $stmt = $db->prepare("SELECT id, name, company_id_number FROM companies WHERE id = :id AND user_id = :user_id");
+    $stmt->execute([':id' => $cid, ':user_id' => $_SESSION['user_id']]);
+    $prefilled_company = $stmt->fetch(PDO::FETCH_ASSOC);
+}
 
 $pageTitle = 'Invoice Generator';
 $activePage = 'invoice';
 require_once __DIR__ . '/includes/header.php';
 ?>
+<script>
+    window.PREFILLED_COMPANY = <?php echo $prefilled_company ? json_encode($prefilled_company) : 'null'; ?>;
+</script>
 
 <div class="page-header" style="display: none;">
     <h1>🧾 Invoice Generator</h1>
@@ -15,17 +28,22 @@ require_once __DIR__ . '/includes/header.php';
 
 <!-- Selection Controls -->
 <style>
-@media print {
-    @page {
-        margin: 0; /* Remove default browser header and footer */
+    @media print {
+        @page {
+            margin: 0;
+            /* Remove default browser header and footer */
+        }
+
+        body {
+            margin: 1cm;
+            /* Add some margin back to the page so content isn't cut off */
+        }
+
+        .invoice-controls-card {
+            display: none !important;
+            /* Hide the selection controls entirely when printing */
+        }
     }
-    body {
-        margin: 1cm; /* Add some margin back to the page so content isn't cut off */
-    }
-    .invoice-controls-card {
-        display: none !important; /* Hide the selection controls entirely when printing */
-    }
-}
 </style>
 <div class="glass-card invoice-controls-card no-print">
     <div class="control-group">
