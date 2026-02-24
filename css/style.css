@@ -1404,3 +1404,20 @@ body {
         font-size: 1.4rem;
     }
 }
+
+/* ─── WebKit / Mac Chrome Click Fix ─── */
+/* Fixes stacking context issues with backdrop-filter blocking clicks on absolute/relative children */
+.main-content {
+    position: relative;
+    z-index: 1;
+}
+
+.glass-card, .search-wrapper, .action-bar {
+    position: relative;
+    z-index: 2;
+}
+
+.btn, a, button, input, select, textarea, .custom-checkbox, .clickable-row, .edit-btn, .delete-one-btn {
+    position: relative;
+    z-index: 10;
+}
