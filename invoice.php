@@ -76,7 +76,7 @@ require_once __DIR__ . '/includes/header.php';
         <table class="data-table print-table" id="invoiceTable">
             <thead>
                 <tr>
-                    <th style="width: 80px;">Photo</th>
+                    <th style="width: 80px;" id="th-invoice-photo">Photo</th>
                     <th>Description</th>
                     <th style="width: 60px;">Qty</th>
                     <th style="width: 120px;">Price</th>
@@ -86,7 +86,7 @@ require_once __DIR__ . '/includes/header.php';
             </thead>
             <tbody id="invoiceBody">
                 <tr id="invoiceEmptyRow">
-                    <td colspan="6">
+                    <td colspan="6" id="emptyRowColspan">
                         <div class="empty-state">
                             <div class="icon">🧾</div>
                             <p>Search and add products above to build your invoice.</p>
@@ -96,7 +96,7 @@ require_once __DIR__ . '/includes/header.php';
             </tbody>
             <tfoot id="invoiceSummary" style="display:none;" class="print-summary-foot">
                 <tr class="print-summary-row">
-                    <td colspan="3" class="print-summary-cell"></td>
+                    <td colspan="3" class="print-summary-cell" id="summaryColspan"></td>
                     <td class="print-summary-cell label">Total</td>
                     <td class="print-summary-cell value" id="invoiceGrandTotal">₾0.00</td>
                     <td class="print-summary-cell no-print"></td>

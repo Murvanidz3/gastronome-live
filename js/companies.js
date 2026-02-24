@@ -183,7 +183,7 @@
                 const data = await res.json();
                 if (data.error) throw new Error(data.error);
 
-                location.reload(); // Quick refresh to show changes
+                window.location.reload(true); // Quick refresh to show changes
             } catch (err) {
                 editError.textContent = err.message || 'Save failed';
                 editError.style.display = '';
@@ -221,7 +221,7 @@
                 });
                 const data = await res.json();
                 if (data.error) throw new Error(data.error);
-                location.reload();
+                window.location.reload(true);
             } catch (err) {
                 alert(err.message || 'Delete failed');
                 confirmModal.style.display = 'none';

@@ -122,7 +122,7 @@ require_once __DIR__ . '/includes/header.php';
             <h2 id="modalTitle">➕ Add Company</h2>
             <button class="btn btn-icon btn-sm btn-secondary" id="closeModal">✕</button>
         </div>
-        <form id="editForm">
+        <form id="editForm" onsubmit="return false;">
             <input type="hidden" id="editId">
             <div class="form-group">
                 <label for="editName">Company Name *</label>

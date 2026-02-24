@@ -137,14 +137,26 @@
     }
 
     function renderInvoice() {
+        const thPhoto = document.getElementById('th-invoice-photo');
+        const emptyRowCol = document.getElementById('emptyRowColspan');
+        const summaryCol = document.getElementById('summaryColspan');
+
         if (!invoiceItems.length) {
             emptyRow.style.display = '';
             summaryEl.style.display = 'none';
             actionsEl.style.display = 'none';
             // Clear any product rows
             invoiceBody.querySelectorAll('tr:not(#invoiceEmptyRow)').forEach(r => r.remove());
+
+            if (thPhoto) thPhoto.style.display = '';
+            if (emptyRowCol) emptyRowCol.setAttribute('colspan', '6');
             return;
         }
+
+        const hasAnyPhoto = invoiceItems.some(i => i.image_url && i.image_url.trim() !== '');
+        if (thPhoto) thPhoto.style.display = hasAnyPhoto ? '' : 'none';
+        if (emptyRowCol) emptyRowCol.setAttribute('colspan', hasAnyPhoto ? '6' : '5');
+        if (summaryCol) summaryCol.setAttribute('colspan', hasAnyPhoto ? '3' : '2');
 
         emptyRow.style.display = 'none';
 
@@ -161,12 +173,18 @@
             subtotal += rowTotal;
 
             const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>
+
+            let photoCell = '';
+            if (hasAnyPhoto) {
+                photoCell = `<td>
                     ${item.image_url
-                    ? `<img src="${escHtml(item.image_url)}" alt="" class="product-img" onerror="this.outerHTML='<div class=\\'product-img-placeholder\\' style=\\'width:40px;height:40px;font-size:0.9rem;\\'>🖼</div>'">`
-                    : `<div class="product-img-placeholder" style="width:40px;height:40px;font-size:0.9rem;">🖼</div>`}
-                </td>
+                        ? `<img src="${escHtml(item.image_url)}" alt="" class="product-img" onerror="this.outerHTML='<div class=\\'product-img-placeholder\\' style=\\'width:40px;height:40px;font-size:0.9rem;\\'>🖼</div>'">`
+                        : `<div class="product-img-placeholder" style="width:40px;height:40px;font-size:0.9rem;">🖼</div>`}
+                </td>`;
+            }
+
+            tr.innerHTML = `
+                ${photoCell}
                 <td>
                     <strong>${escHtml(item.name)}</strong>
                 </td>
