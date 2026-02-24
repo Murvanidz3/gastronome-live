@@ -410,7 +410,7 @@ require_once __DIR__ . '/includes/header.php';
         if (!confirm('Are you sure you want to delete this invoice? This action cannot be undone.')) return;
 
         try {
-            const res = await fetch('/api/delete_invoice.php', {
+            const res = await fetch('/api/delete_invoice', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ id: id })

@@ -55,6 +55,34 @@ foreach ($items as $item) {
         Company</a>
 </div>
 
+<style>
+    @media print {
+        @page {
+            margin: 0;
+            /* Remove default browser header and footer */
+        }
+
+        body {
+            margin: 1cm;
+            /* Add some margin back to the page so content isn't cut off */
+        }
+
+        .no-print {
+            display: none !important;
+        }
+
+        .glass-card {
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+        }
+    }
+</style>
+
 <!-- Invoice Table -->
 <div class="glass-card">
     <!-- Print Header -->
@@ -76,7 +104,8 @@ foreach ($items as $item) {
 
         <div class="print-bill-to">
             <div class="bill-to-date bg-box">
-                <?php echo date('d/m/Y', strtotime($invoice['invoice_date'] ?? $invoice['created_at'])); ?></div>
+                <?php echo date('d/m/Y', strtotime($invoice['invoice_date'] ?? $invoice['created_at'])); ?>
+            </div>
             <div class="bill-to-title bg-box">BILL TO</div>
             <div class="bill-to-inputs">
                 <input type="text" value="<?php echo htmlspecialchars($invoice['company_name']); ?>" class="print-input"
