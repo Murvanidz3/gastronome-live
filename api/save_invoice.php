@@ -24,6 +24,17 @@ if (empty($input['company_id']) || empty($input['invoice_number'])) {
 $company_id = (int) $input['company_id'];
 $invoice_number = $input['invoice_number'];
 $total_amount = (float) $input['total_amount'];
+
+// New fields
+$invoice_date = $input['invoice_date'] ?? null;
+$due_date = $input['due_date'] ?? null;
+$subtotal = isset($input['subtotal']) ? (float) $input['subtotal'] : null;
+$tax_rate = isset($input['tax_rate']) ? (float) $input['tax_rate'] : null;
+$tax_amount = isset($input['tax_amount']) ? (float) $input['tax_amount'] : null;
+$discount_amount = isset($input['discount_amount']) ? (float) $input['discount_amount'] : null;
+$notes = $input['notes'] ?? null;
+$items_json = isset($input['items']) ? json_encode($input['items'], JSON_UNESCAPED_UNICODE) : null;
+
 $user_id = $_SESSION['user_id'];
 
 try {
@@ -44,12 +55,56 @@ try {
     $check->execute([':inv' => $invoice_number, ':cid' => $company_id]);
 
     if (!$check->fetch()) {
-        $insert = $db->prepare('INSERT INTO invoices (user_id, company_id, invoice_number, total_amount) VALUES (:uid, :cid, :inv, :total)');
+        $insert = $db->prepare('
+            INSERT INTO invoices (
+                user_id, company_id, invoice_number, total_amount,
+                invoice_date, due_date, subtotal, tax_rate, tax_amount, discount_amount, notes, items_json
+            ) VALUES (
+                :uid, :cid, :inv, :total,
+                :inv_date, :due_date, :subtotal, :tax_rate, :tax_amount, :discount_amount, :notes, :items_json
+            )
+        ');
         $insert->execute([
             ':uid' => $user_id,
             ':cid' => $company_id,
             ':inv' => $invoice_number,
-            ':total' => $total_amount
+            ':total' => $total_amount,
+            ':inv_date' => $invoice_date,
+            ':due_date' => $due_date,
+            ':subtotal' => $subtotal,
+            ':tax_rate' => $tax_rate,
+            ':tax_amount' => $tax_amount,
+            ':discount_amount' => $discount_amount,
+            ':notes' => $notes,
+            ':items_json' => $items_json
+        ]);
+    } else {
+        // If it exists (user clicked print multiple times), update it with the latest data instead of ignoring
+        $update = $db->prepare('
+            UPDATE invoices SET 
+                total_amount = :total,
+                invoice_date = :inv_date,
+                due_date = :due_date,
+                subtotal = :subtotal,
+                tax_rate = :tax_rate,
+                tax_amount = :tax_amount,
+                discount_amount = :discount_amount,
+                notes = :notes,
+                items_json = :items_json
+            WHERE invoice_number = :inv AND company_id = :cid
+        ');
+        $update->execute([
+            ':total' => $total_amount,
+            ':inv_date' => $invoice_date,
+            ':due_date' => $due_date,
+            ':subtotal' => $subtotal,
+            ':tax_rate' => $tax_rate,
+            ':tax_amount' => $tax_amount,
+            ':discount_amount' => $discount_amount,
+            ':notes' => $notes,
+            ':items_json' => $items_json,
+            ':inv' => $invoice_number,
+            ':cid' => $company_id
         ]);
     }
 

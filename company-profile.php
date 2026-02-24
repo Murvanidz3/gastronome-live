@@ -191,7 +191,8 @@ require_once __DIR__ . '/includes/header.php';
                                 </div>
 
                                 <div style="display: none;" class="full-note-text">
-                                    <?php echo htmlspecialchars($note['text']); ?></div>
+                                    <?php echo htmlspecialchars($note['text']); ?>
+                                </div>
                                 <div style="display: none;" class="note-id"><?php echo $nId; ?></div>
 
                                 <div
@@ -242,7 +243,14 @@ require_once __DIR__ . '/includes/header.php';
                                     <tr>
                                         <td style="padding: 10px;"><?php echo date('d/m/Y', strtotime($inv['created_at'])); ?>
                                         </td>
-                                        <td style="padding: 10px;">#<?php echo htmlspecialchars($inv['invoice_number']); ?></td>
+                                        <td style="padding: 10px;">
+                                            <a href="/view_invoice.php?id=<?php echo $inv['id']; ?>"
+                                                style="color: var(--primary-color); text-decoration: none; font-weight: bold; transition: color 0.2s;"
+                                                onmouseover="this.style.color='var(--primary-hover)'"
+                                                onmouseout="this.style.color='var(--primary-color)'">
+                                                #<?php echo htmlspecialchars($inv['invoice_number']); ?>
+                                            </a>
+                                        </td>
                                         <td style="padding: 10px; text-align: right; font-weight: bold;">
                                             ₾<?php echo number_format($inv['total_amount'], 2); ?></td>
                                     </tr>
