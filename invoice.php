@@ -14,6 +14,18 @@ if (isset($_GET['company_id'])) {
     $prefilled_company = $stmt->fetch(PDO::FETCH_ASSOC);
 }
 
+// Fetch user's invoice history
+$db = getDB();
+$stmtInv = $db->prepare("
+    SELECT i.*, c.name as company_name 
+    FROM invoices i
+    JOIN companies c ON i.company_id = c.id
+    WHERE i.user_id = :user_id
+    ORDER BY i.created_at DESC
+");
+$stmtInv->execute([':user_id' => $_SESSION['user_id']]);
+$user_invoices = $stmtInv->fetchAll(PDO::FETCH_ASSOC);
+
 $pageTitle = 'Invoice Generator';
 $activePage = 'invoice';
 require_once __DIR__ . '/includes/header.php';
@@ -157,6 +169,63 @@ require_once __DIR__ . '/includes/header.php';
 <div class="invoice-actions mt-3" id="invoiceActions" style="display:none;">
     <button class="btn btn-secondary" id="clearInvoiceBtn">🗑 Clear All</button>
     <button class="btn btn-primary" id="printInvoiceBtn">🖨 Print Invoice</button>
+</div>
+
+<!-- Global Invoice History Section -->
+<div class="glass-card mt-4 no-print" style="margin-top: 40px; padding: 20px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2 style="font-size: 1.25rem; margin: 0; color: var(--text-primary);">🗂 Recent Invoices</h2>
+    </div>
+
+    <?php if (empty($user_invoices)): ?>
+        <div class="empty-state" style="padding: 30px 10px;">
+            <div class="icon" style="font-size: 2rem;">📭</div>
+            <p style="font-size: 0.9rem;">You haven't generated any invoices yet.</p>
+        </div>
+    <?php else: ?>
+        <div class="table-wrapper" style="overflow-x: auto;">
+            <table class="data-table" style="font-size: 0.95rem;">
+                <thead>
+                    <tr>
+                        <th style="padding: 12px; text-align: left;">Date</th>
+                        <th style="padding: 12px; text-align: left;">Invoice #</th>
+                        <th style="padding: 12px; text-align: left;">Bill To</th>
+                        <th style="padding: 12px; text-align: right;">Total Amount</th>
+                        <th style="padding: 12px; text-align: center; width: 100px;">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($user_invoices as $inv): ?>
+                        <tr class="hover-glow" style="cursor: default;">
+                            <td style="padding: 12px; color: var(--text-secondary);">
+                                <?php echo date('d/m/Y H:i', strtotime($inv['created_at'])); ?>
+                            </td>
+                            <td style="padding: 12px;">
+                                <a href="/view_invoice.php?id=<?php echo $inv['id']; ?>"
+                                    style="color: var(--primary-color); text-decoration: none; font-weight: bold; transition: color 0.2s;"
+                                    onmouseover="this.style.color='var(--primary-hover)'"
+                                    onmouseout="this.style.color='var(--primary-color)'">
+                                    #<?php echo htmlspecialchars($inv['invoice_number']); ?>
+                                </a>
+                            </td>
+                            <td style="padding: 12px; color: var(--text-primary); font-weight: 500;">
+                                <?php echo htmlspecialchars($inv['company_name']); ?>
+                            </td>
+                            <td style="padding: 12px; text-align: right; font-weight: bold; color: var(--text-primary);">
+                                ₾<?php echo number_format($inv['total_amount'], 2); ?>
+                            </td>
+                            <td style="padding: 12px; text-align: center;">
+                                <a href="/view_invoice.php?id=<?php echo $inv['id']; ?>" class="btn btn-secondary btn-sm"
+                                    style="font-size: 0.75rem; padding: 4px 10px;">
+                                    View
+                                </a>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+    <?php endif; ?>
 </div>
 
 <script src="/js/invoice.js?v=<?php echo time(); ?>"></script>
