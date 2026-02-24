@@ -14,7 +14,20 @@ require_once __DIR__ . '/includes/header.php';
 </div>
 
 <!-- Selection Controls -->
-<div class="glass-card invoice-controls-card">
+<style>
+@media print {
+    @page {
+        margin: 0; /* Remove default browser header and footer */
+    }
+    body {
+        margin: 1cm; /* Add some margin back to the page so content isn't cut off */
+    }
+    .invoice-controls-card {
+        display: none !important; /* Hide the selection controls entirely when printing */
+    }
+}
+</style>
+<div class="glass-card invoice-controls-card no-print">
     <div class="control-group">
         <label>Add products to invoice</label>
         <div class="invoice-search-wrapper">
