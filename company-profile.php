@@ -236,6 +236,7 @@ require_once __DIR__ . '/includes/header.php';
                                     <th style="padding: 10px;">Date</th>
                                     <th style="padding: 10px;">Invoice #</th>
                                     <th style="padding: 10px; text-align: right;">Total</th>
+                                    <th style="padding: 10px; text-align: center; width: 60px;">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -253,6 +254,12 @@ require_once __DIR__ . '/includes/header.php';
                                         </td>
                                         <td style="padding: 10px; text-align: right; font-weight: bold;">
                                             ₾<?php echo number_format($inv['total_amount'], 2); ?></td>
+                                        <td
+                                            style="padding: 10px; text-align: center; display: flex; gap: 4px; justify-content: center;">
+                                            <button class="btn btn-icon btn-sm btn-danger no-print"
+                                                onclick="deleteInvoice(<?php echo $inv['id']; ?>, event)" title="Delete Invoice"
+                                                style="font-size: 0.75rem; width: 24px; height: 24px; padding: 0;">🗑</button>
+                                        </td>
                                     </tr>
                                 <?php endforeach; ?>
                             </tbody>
@@ -397,6 +404,27 @@ require_once __DIR__ . '/includes/header.php';
             closeNoteModal();
         }
     });
+
+    async function deleteInvoice(id, event) {
+        if (event) event.stopPropagation();
+        if (!confirm('Are you sure you want to delete this invoice? This action cannot be undone.')) return;
+
+        try {
+            const res = await fetch('/api/delete_invoice.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: id })
+            });
+
+            if (!res.ok) throw new Error('Failed to delete invoice');
+
+            // Reload page to update the table
+            window.location.reload(true);
+        } catch (err) {
+            alert('Error deleting invoice.');
+            console.error(err);
+        }
+    }
 </script>
 </body>
 

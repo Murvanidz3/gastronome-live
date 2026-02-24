@@ -214,11 +214,12 @@ require_once __DIR__ . '/includes/header.php';
                             <td style="padding: 12px; text-align: right; font-weight: bold; color: var(--text-primary);">
                                 ₾<?php echo number_format($inv['total_amount'], 2); ?>
                             </td>
-                            <td style="padding: 12px; text-align: center;">
+                            <td style="padding: 12px; text-align: center; display: flex; gap: 8px; justify-content: center; align-items: center;">
                                 <a href="/view_invoice.php?id=<?php echo $inv['id']; ?>" class="btn btn-secondary btn-sm"
                                     style="font-size: 0.75rem; padding: 4px 10px;">
                                     View
                                 </a>
+                                <button class="btn btn-icon btn-sm btn-danger no-print" onclick="deleteInvoice(<?php echo $inv['id']; ?>, event)" title="Delete Invoice" style="font-size: 0.8rem; width: 26px; height: 26px; padding: 0;">🗑</button>
                             </td>
                         </tr>
                     <?php endforeach; ?>
@@ -241,6 +242,27 @@ require_once __DIR__ . '/includes/header.php';
                 sidebar.classList.remove('open');
             }
         });
+    }
+
+    async function deleteInvoice(id, event) {
+        if (event) event.stopPropagation();
+        if (!confirm('Are you sure you want to delete this invoice? This action cannot be undone.')) return;
+
+        try {
+            const res = await fetch('/api/delete_invoice.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: id })
+            });
+
+            if (!res.ok) throw new Error('Failed to delete invoice');
+            
+            // Reload page to update the table
+            window.location.reload(true);
+        } catch (err) {
+            alert('Error deleting invoice.');
+            console.error(err);
+        }
     }
 </script>
 </body>
