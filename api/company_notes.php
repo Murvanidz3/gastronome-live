@@ -39,6 +39,7 @@ try {
         exit;
     }
 
+    $action = $input['action'] ?? 'add';
     $existing_notes_raw = $company['notes'];
     $notes_array = [];
 
@@ -46,21 +47,47 @@ try {
         $decoded = json_decode($existing_notes_raw, true);
         if (is_array($decoded)) {
             $notes_array = $decoded;
+            // Ensure all notes have an id
+            foreach ($notes_array as &$n) {
+                if (!isset($n['id'])) {
+                    $n['id'] = uniqid('note_');
+                }
+            }
         } else {
             // Migration: old note was plain text
             $notes_array[] = [
+                'id' => uniqid('note_'),
                 'text' => $existing_notes_raw,
-                'date' => date('Y-m-d\TH:i:sP') // current time as we don't know when it was added
+                'date' => date('Y-m-d\TH:i:sP')
             ];
         }
     }
 
-    // Append new note if it's not empty
-    if (trim($notes) !== '') {
-        $notes_array[] = [
-            'text' => trim($notes),
-            'date' => date('Y-m-d\TH:i:sP')
-        ];
+    if ($action === 'add') {
+        if (trim($notes) !== '') {
+            $notes_array[] = [
+                'id' => uniqid('note_'),
+                'text' => trim($notes),
+                'date' => date('Y-m-d\TH:i:sP')
+            ];
+        }
+    } elseif ($action === 'edit') {
+        $note_id = $input['note_id'] ?? '';
+        if ($note_id && trim($notes) !== '') {
+            foreach ($notes_array as &$n) {
+                if ($n['id'] === $note_id) {
+                    $n['text'] = trim($notes);
+                    break;
+                }
+            }
+        }
+    } elseif ($action === 'delete') {
+        $note_id = $input['note_id'] ?? '';
+        if ($note_id) {
+            $notes_array = array_values(array_filter($notes_array, function ($n) use ($note_id) {
+                return $n['id'] !== $note_id;
+            }));
+        }
     }
 
     $new_notes_json = json_encode($notes_array, JSON_UNESCAPED_UNICODE);

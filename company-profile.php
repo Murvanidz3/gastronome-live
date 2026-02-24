@@ -169,16 +169,29 @@ require_once __DIR__ . '/includes/header.php';
                             <p style="font-size: 0.85rem; margin: 0;">No updates yet.</p>
                         </div>
                     <?php else: ?>
-                        <?php foreach ($notes_data as $note): ?>
+                        <?php foreach ($notes_data as $note): 
+                            $nId = $note['id'] ?? uniqid('n_');
+                        ?>
                             <div class="note-card hover-glow"
-                                style="padding: 10px 12px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; cursor: pointer; border: 1px solid rgba(255, 255, 255, 0.05); transition: background 0.2s;"
+                                style="position: relative; padding: 10px 12px; padding-left: 16px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; cursor: pointer; border: 1px solid rgba(255, 255, 255, 0.05); transition: background 0.2s;"
                                 onclick="openNoteModal(this)">
-                                <div style="display: none;" class="full-note-text">
-                                    <?php echo htmlspecialchars($note['text']); ?></div>
-                                <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 4px;">
-                                    <?php echo date('M j, Y, H:i', strtotime($note['date'] ?? 'now')); ?></div>
+                                <!-- Thin shape linear gradient -->
+                                <div style="position: absolute; left: -1px; top: -1px; bottom: -1px; width: 4px; background: linear-gradient(135deg, #6366f1, #8b5cf6); border-radius: 8px 0 0 8px;"></div>
+                                
+                                <!-- Action buttons -->
+                                <div style="position: absolute; right: 8px; top: 10px; display: flex; gap: 6px;">
+                                    <button class="btn btn-icon btn-sm btn-secondary" style="width: 24px; height: 24px; padding: 0; font-size: 0.7rem;" onclick="editNote('<?php echo $nId; ?>', this, event)" title="Edit">✏️</button>
+                                    <button class="btn btn-icon btn-sm btn-danger" style="width: 24px; height: 24px; padding: 0; font-size: 0.7rem;" onclick="deleteNote('<?php echo $nId; ?>', event)" title="Delete">🗑</button>
+                                </div>
+
+                                <div style="display: none;" class="full-note-text"><?php echo htmlspecialchars($note['text']); ?></div>
+                                <div style="display: none;" class="note-id"><?php echo $nId; ?></div>
+                                
+                                <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 4px; padding-right: 50px;">
+                                    <?php echo date('M j, Y, H:i', strtotime($note['date'] ?? 'now')); ?>
+                                </div>
                                 <div
-                                    style="font-size: 0.9rem; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-height: 20px;">
+                                    style="font-size: 0.9rem; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-height: 20px; padding-right: 50px;">
                                     <?php echo htmlspecialchars($note['text']); ?>
                                 </div>
                             </div>
@@ -237,7 +250,9 @@ require_once __DIR__ . '/includes/header.php';
             <h2>📝 Note Update</h2>
             <button class="btn btn-icon btn-sm btn-secondary" onclick="closeNoteModal()">✕</button>
         </div>
-        <div id="noteModalContent" style="padding: 10px 0; color: var(--text-primary); font-size: 1rem; line-height: 1.6; white-space: pre-wrap; max-height: 400px; overflow-y: auto;"></div>
+        <div id="noteModalContent"
+            style="padding: 10px 0; color: var(--text-primary); font-size: 1rem; line-height: 1.6; white-space: pre-wrap; max-height: 400px; overflow-y: auto;">
+        </div>
         <div class="modal-actions" style="margin-top: 20px;">
             <button class="btn btn-secondary" onclick="closeNoteModal()">Close</button>
         </div>
@@ -262,22 +277,31 @@ require_once __DIR__ . '/includes/header.php';
     const companyNotes = document.getElementById('companyNotes');
     const notesStatus = document.getElementById('notesStatus');
 
+    let editingNoteId = null;
+
     if (saveNotesBtn && companyNotes) {
         saveNotesBtn.addEventListener('click', async () => {
             const newNote = companyNotes.value.trim();
             if (!newNote) return; // Prevent empty saves
-            
+
             saveNotesBtn.disabled = true;
             saveNotesBtn.textContent = 'Saving...';
+
+            const payload = {
+                id: <?php echo $company['id']; ?>,
+                notes: newNote,
+                action: editingNoteId ? 'edit' : 'add'
+            };
+
+            if (editingNoteId) {
+                payload.note_id = editingNoteId;
+            }
 
             try {
                 const res = await fetch('/api/company_notes', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        id: <?php echo $company['id']; ?>,
-                        notes: newNote
-                    })
+                    body: JSON.stringify(payload)
                 });
 
                 if (!res.ok) throw new Error('Failed to save note');
@@ -290,9 +314,46 @@ require_once __DIR__ . '/includes/header.php';
             } catch (err) {
                 alert('Error saving note.');
                 saveNotesBtn.disabled = false;
-                saveNotesBtn.textContent = 'Save Note';
+                saveNotesBtn.textContent = editingNoteId ? 'Update Note' : 'Save Note';
             }
         });
+    }
+
+    // Edit/Delete Logic
+    function editNote(id, btnEl, e) {
+        e.stopPropagation();
+        const card = btnEl.closest('.note-card');
+        const text = card.querySelector('.full-note-text').textContent;
+
+        companyNotes.value = text;
+        companyNotes.focus();
+        editingNoteId = id;
+        saveNotesBtn.textContent = 'Update Note';
+
+        // Let's scroll to the textarea
+        companyNotes.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    async function deleteNote(id, e) {
+        e.stopPropagation();
+        if (!confirm('Are you sure you want to delete this note?')) return;
+
+        try {
+            const res = await fetch('/api/company_notes', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    id: <?php echo $company['id']; ?>,
+                    action: 'delete',
+                    note_id: id
+                })
+            });
+
+            if (!res.ok) throw new Error('Failed to delete note');
+            window.location.reload(true);
+        } catch (err) {
+            alert('Error deleting note.');
+        }
     }
 
     // Modal Logic
